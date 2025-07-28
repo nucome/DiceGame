@@ -72,3 +72,25 @@ promt 2:  improve the code to change the number of Dice used and the number of s
   - Updated main() to parse command line arguments
   - All references now use instance variables instead of constants
 
+  promt 3: Can the code be improved with better performance?
+
+  Yes, the code has been significantly optimized for better performance:
+
+    Key optimizations:
+    1. Array instead of ArrayList - Eliminates object creation/resizing overhead
+    2. Single-pass dice processing - Finds threes and minimum in one loop instead of separate contains() and min() calls
+    3. Primitive array for score tracking - Replaced HashMap with int array for O(1) access
+    4. Eliminated boxing/unboxing - No Integer wrapper objects
+    5. Removed Collection operations - No more removeAll(), Collections.min(), sorting
+
+    Performance improvements:
+    - Reduced memory allocations per game from ~10+ objects to 1 array
+    - Eliminated autoboxing overhead
+    - O(1) score frequency updates vs O(log n) HashMap operations
+    - Direct array access vs collection iteration
+
+    Test the optimized version:
+    java DiceGame.java 5 100000
+
+    The performance should be noticeably faster, especially with larger simulation counts.
+

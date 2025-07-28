@@ -52,7 +52,7 @@ public class DiceGame {
         }
         
         long endTime = System.currentTimeMillis();
-        double duration = (endTime - startTime) / 1000.0;
+        long duration = endTime - startTime;
         
         System.out.println("Number of simulations was " + numSimulations + " using " + numDice + " dice.");
         
@@ -62,11 +62,11 @@ public class DiceGame {
         for (int score : sortedScores) {
             int count = scoreFrequency.get(score);
             double percentage = (double) count * 100 / numSimulations;
-            System.out.printf("Total %d occurs %.2f occurred %.1f times.%n", 
+            System.out.printf("Total %d occurs %.2f%% occurred %.1f times.%n",
                 score, percentage, (double) count);
         }
         
-        System.out.printf("Total simulation took %.1f seconds.%n", duration);
+    System.out.printf("Total simulation took %d milliseconds.%n", duration);
     }
     
     public static void main(String[] args) {
