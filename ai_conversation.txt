@@ -94,3 +94,9 @@ promt 2:  improve the code to change the number of Dice used and the number of s
 
     The performance should be noticeably faster, especially with larger simulation counts.
 
+    Before change:
+    Total simulation took 50 milliseconds.
+
+    After change:
+    Total simulation took 5 milliseconds.
+

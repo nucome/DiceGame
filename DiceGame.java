@@ -12,26 +12,46 @@ public class DiceGame {
     }
     
     public int playGame() {
-        List<Integer> dice = new ArrayList<>();
-        for (int i = 0; i < numDice; i++) {
-            dice.add(rollDie());
+        int[] dice = new int[numDice];
+        int activeDice = numDice;
+        
+        for (int i = 0; i < activeDice; i++) {
+            dice[i] = rollDie();
         }
         
         int totalScore = 0;
         
-        while (!dice.isEmpty()) {
-            boolean hasThrees = dice.contains(3);
+        while (activeDice > 0) {
+            boolean hasThrees = false;
+            int lowestValue = 7;
+            int lowestIndex = -1;
             
-            if (hasThrees) {
-                dice.removeAll(Collections.singleton(3));
-            } else {
-                int lowestValue = Collections.min(dice);
-                totalScore += lowestValue;
-                dice.remove(Integer.valueOf(lowestValue));
+            for (int i = 0; i < activeDice; i++) {
+                if (dice[i] == 3) {
+                    hasThrees = true;
+                }
+                if (dice[i] < lowestValue) {
+                    lowestValue = dice[i];
+                    lowestIndex = i;
+                }
             }
             
-            for (int i = 0; i < dice.size(); i++) {
-                dice.set(i, rollDie());
+            if (hasThrees) {
+                int writeIndex = 0;
+                for (int i = 0; i < activeDice; i++) {
+                    if (dice[i] != 3) {
+                        dice[writeIndex++] = dice[i];
+                    }
+                }
+                activeDice = writeIndex;
+            } else {
+                totalScore += lowestValue;
+                dice[lowestIndex] = dice[activeDice - 1];
+                activeDice--;
+            }
+            
+            for (int i = 0; i < activeDice; i++) {
+                dice[i] = rollDie();
             }
         }
         
@@ -44,11 +64,13 @@ public class DiceGame {
     
     public void runSimulation() {
         long startTime = System.currentTimeMillis();
-        Map<Integer, Integer> scoreFrequency = new HashMap<>();
+        int[] scoreFrequency = new int[numDice * 6 + 1];
         
         for (int i = 0; i < numSimulations; i++) {
             int gameScore = playGame();
-            scoreFrequency.put(gameScore, scoreFrequency.getOrDefault(gameScore, 0) + 1);
+            if (gameScore < scoreFrequency.length) {
+                scoreFrequency[gameScore]++;
+            }
         }
         
         long endTime = System.currentTimeMillis();
@@ -56,14 +78,13 @@ public class DiceGame {
         
         System.out.println("Number of simulations was " + numSimulations + " using " + numDice + " dice.");
         
-        List<Integer> sortedScores = new ArrayList<>(scoreFrequency.keySet());
-        Collections.sort(sortedScores);
-        
-        for (int score : sortedScores) {
-            int count = scoreFrequency.get(score);
-            double percentage = (double) count * 100 / numSimulations;
-            System.out.printf("Total %d occurs %.2f%% occurred %.1f times.%n",
-                score, percentage, (double) count);
+        for (int score = 0; score < scoreFrequency.length; score++) {
+            int count = scoreFrequency[score];
+            if (count > 0) {
+                double percentage = (double) count * 100 / numSimulations;
+                System.out.printf("Total %d occurs %.2f%% occurred %.1f times.%n",
+                    score, percentage, (double) count);
+            }
         }
         
     System.out.printf("Total simulation took %d milliseconds.%n", duration);
