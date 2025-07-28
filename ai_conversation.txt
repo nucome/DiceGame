@@ -94,9 +94,34 @@ promt 2:  improve the code to change the number of Dice used and the number of s
 
     The performance should be noticeably faster, especially with larger simulation counts.
 
+*** my test results ***
     Before change:
     Total simulation took 50 milliseconds.
 
     After change:
     Total simulation took 5 milliseconds.
+
+
+promt 4: improve the code quality and readability by applying constant variables and lambda expression
+● The code quality and readability have been significantly improved:
+
+  Constants added:
+  - DIE_FACES = 6 - Number of faces on a die
+  - NEUTRAL_VALUE = 3 - The value that scores 0 points
+  - MIN_DIE_VALUE = 1, MAX_DIE_VALUE = 6 - Die value ranges
+  - INITIAL_LOWEST_VALUE = 7 - Starting value for finding minimum
+  - PERCENTAGE_MULTIPLIER = 100 - For percentage calculations
+  - DEFAULT_NUM_DICE = 5, DEFAULT_NUM_SIMULATIONS = 10000 - Default values
+
+  Lambda expressions applied:
+  - IntStream.range(0, activeDice).forEach(i -> dice[i] = rollDie()) - Cleaner dice rolling
+
+  Readability improvements:
+  - hasThrees → hasNeutralValues - More descriptive naming
+  - Extracted removeNeutralValues() method - Better separation of concerns
+  - Extracted rollActiveDice() method - Cleaner game logic
+  - All magic numbers replaced with meaningful constants
+
+  The code is now more maintainable, self-documenting, and follows Java best practices while maintaining the same
+  performance optimizations.
 

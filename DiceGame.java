@@ -1,6 +1,16 @@
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class DiceGame {
+    private static final int DIE_FACES = 6;
+    private static final int NEUTRAL_VALUE = 3;
+    private static final int MIN_DIE_VALUE = 1;
+    private static final int MAX_DIE_VALUE = 6;
+    private static final int INITIAL_LOWEST_VALUE = MAX_DIE_VALUE + 1;
+    private static final int PERCENTAGE_MULTIPLIER = 100;
+    private static final int DEFAULT_NUM_DICE = 5;
+    private static final int DEFAULT_NUM_SIMULATIONS = 10000;
+    
     private final int numDice;
     private final int numSimulations;
     private final Random random;
@@ -22,13 +32,13 @@ public class DiceGame {
         int totalScore = 0;
         
         while (activeDice > 0) {
-            boolean hasThrees = false;
-            int lowestValue = 7;
+            boolean hasNeutralValues = false;
+            int lowestValue = INITIAL_LOWEST_VALUE;
             int lowestIndex = -1;
             
             for (int i = 0; i < activeDice; i++) {
-                if (dice[i] == 3) {
-                    hasThrees = true;
+                if (dice[i] == NEUTRAL_VALUE) {
+                    hasNeutralValues = true;
                 }
                 if (dice[i] < lowestValue) {
                     lowestValue = dice[i];
@@ -36,35 +46,41 @@ public class DiceGame {
                 }
             }
             
-            if (hasThrees) {
-                int writeIndex = 0;
-                for (int i = 0; i < activeDice; i++) {
-                    if (dice[i] != 3) {
-                        dice[writeIndex++] = dice[i];
-                    }
-                }
-                activeDice = writeIndex;
+            if (hasNeutralValues) {
+                activeDice = removeNeutralValues(dice, activeDice);
             } else {
                 totalScore += lowestValue;
                 dice[lowestIndex] = dice[activeDice - 1];
                 activeDice--;
             }
             
-            for (int i = 0; i < activeDice; i++) {
-                dice[i] = rollDie();
-            }
+            rollActiveDice(dice, activeDice);
         }
         
         return totalScore;
     }
     
     private int rollDie() {
-        return random.nextInt(6) + 1;
+        return random.nextInt(DIE_FACES) + MIN_DIE_VALUE;
+    }
+    
+    private int removeNeutralValues(int[] dice, int activeDice) {
+        int writeIndex = 0;
+        for (int i = 0; i < activeDice; i++) {
+            if (dice[i] != NEUTRAL_VALUE) {
+                dice[writeIndex++] = dice[i];
+            }
+        }
+        return writeIndex;
+    }
+    
+    private void rollActiveDice(int[] dice, int activeDice) {
+        IntStream.range(0, activeDice).forEach(i -> dice[i] = rollDie());
     }
     
     public void runSimulation() {
         long startTime = System.currentTimeMillis();
-        int[] scoreFrequency = new int[numDice * 6 + 1];
+        int[] scoreFrequency = new int[numDice * MAX_DIE_VALUE + 1];
         
         for (int i = 0; i < numSimulations; i++) {
             int gameScore = playGame();
@@ -81,7 +97,7 @@ public class DiceGame {
         for (int score = 0; score < scoreFrequency.length; score++) {
             int count = scoreFrequency[score];
             if (count > 0) {
-                double percentage = (double) count * 100 / numSimulations;
+                double percentage = (double) count * PERCENTAGE_MULTIPLIER / numSimulations;
                 System.out.printf("Total %d occurs %.2f%% occurred %.1f times.%n",
                     score, percentage, (double) count);
             }
@@ -91,8 +107,8 @@ public class DiceGame {
     }
     
     public static void main(String[] args) {
-        int numDice = 5;
-        int numSimulations = 10000;
+        int numDice = DEFAULT_NUM_DICE;
+        int numSimulations = DEFAULT_NUM_SIMULATIONS;
         
         if (args.length >= 1) {
             numDice = Integer.parseInt(args[0]);
